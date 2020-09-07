@@ -8,12 +8,12 @@ export default class NoteCard extends Component {
                 <Col sm="12" md="12" lg="6" xl="4" className="my-3">
                     <Card bg="light" border="dark">
                         <Card.Body>
-                            <Card.Title>
-                                {this.props.title}
-                            </Card.Title>
                             <Card.Text>
-                                {this.props.description}
+                                {this.props.content}
                             </Card.Text>
+                            <Card.Footer className="my-2">
+                                {this.props.lastUpdate}
+                            </Card.Footer>
                             <Button variant="outline-dark">
                                 EDIT
                             </Button>
