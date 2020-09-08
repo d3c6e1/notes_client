@@ -1,9 +1,9 @@
 export default class BaseError extends Error {
     constructor ({code, message, status}) {
-        super()
+        super();
 
-        this.code = code
-        this.message = message
-        this.status = status
+        this.code = code;
+        this.message = message;
+        this.status = status;
     }
 }

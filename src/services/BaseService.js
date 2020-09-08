@@ -11,26 +11,22 @@ function onSuccess(response) {
     try {
         parsed = JSON.parse(response.text);
     } catch (e) {
-        throw {
-            status: 'Response parse error',
-            body: response.body,
-        }
+        throw new Error('Response parse error', response.toString());
     }
 
-    const body = parsed.body;
-    const status = parsed.statusCode;
+    const status = response.status;
 
-    if ((status === 200 || status === 201) && body.success !== false) {
-        return body;
+    if (status === 200 || status === 201) {
+        return parsed;
     }
 
-    throw new ServerError({ status, ...body.error });
+    throw new ServerError({ status, response });
 }
 
 // if server dead
 function onFailure(response) {
-    const { status, message, response: { body }, } = response;
-    throw new ServerError({ body, status, code: 'internal.server.error', message: body.message || message, });
+    const { status, message, response: { body } } = response;
+    throw new ServerError({ body, status, code: 'internal.server.error', message: body.message || message });
 }
 
 export default class BaseService {

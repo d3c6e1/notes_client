@@ -25,8 +25,8 @@ export default class NotesCardDeck extends Component {
     }
 
     load() {
-        service.getAllNotes().then(({success, data}) => {
-            if(success){
+        service.getAllNotes().then((data) => {
+            if(data){
                 this.setState({notes: [...data]});
             }
         });
@@ -38,7 +38,7 @@ export default class NotesCardDeck extends Component {
                 <CardDeck className="m-4">
                     {
                         this.state.notes.map((note) => (
-                            <NoteCard id={note.id} content={note.content} lastUpdate={note.lastUpdate} />
+                            <NoteCard id={note.id} content={note.content} lastUpdate={new Date(Date.parse(note.lastUpdate)).toLocaleString()} />
                         ))
                     }
                 </CardDeck>
