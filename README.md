@@ -1,2 +1,3 @@
-# notes_client
-Application for management (creating, editing, deleting) notes. UI client
+# Notes Management Application
+  
+Application for management (creating, editing, deleting) notes.
