@@ -1,5 +1,5 @@
 import request from 'superagent';
-import { each, keys, some, extend, isObject } from 'underscore';
+import { each, keys, isObject } from 'underscore';
 
 import ServerError from '../lib/errors/ServerError';
 
@@ -23,10 +23,8 @@ function onSuccess(response) {
     throw new ServerError({ status, response });
 }
 
-// if server dead
 function onFailure(response) {
-    const { status, message, response: { body } } = response;
-    throw new ServerError({ body, status, code: 'internal.server.error', message: body.message || message });
+    throw new ServerError({ response });
 }
 
 export default class BaseService {
@@ -41,61 +39,52 @@ export default class BaseService {
             ...opts
         };
 
-        const {remote} = config;
+        const { type, method } = opts;
+        const url = `${config.api_url}${opts.url}`;
 
-        // mock server
-        if(!remote.isEnabled){
-            // TODO mock server
+        if (method === 'GET') {
+            let rq = request.get(url)
+                .query(opts.params)
+                .timeout({response: config.responseTimeout});
+
+            const {headers} = opts;
+            if (headers) {
+                each(keys(headers), key => {
+                    rq.set(key, headers[key]);
+                })
+            }
+            return rq.then(onSuccess, onFailure);
         }
-        // real server
-        else {
-            const { type, method } = opts;
-            const url = `${remote.url}${opts.url}`;
 
-            if (method === 'GET') {
-                let rq = request.get(url)
-                    .query(opts.params)
-                    .timeout({response: config.responseTimeout});
+        if (method === 'POST' || method === 'PUT') {
+            let rq = request(method, url).type(type)
+                .timeout({response: config.responseTimeout});
 
-                const {headers} = opts;
-                if (headers) {
-                    each(keys(headers), key => {
-                        rq.set(key, headers[key]);
-                    })
-                }
-                return rq.then(onSuccess, onFailure);
-            }
+            if (type === 'multipart/form-data') {
+                each(opts.body, (v, k) => {
+                    if (v instanceof File) {
+                        rq = rq.attach(k, v);
+                    }
 
-            if (method === 'POST' || method === 'PUT') {
-                let rq = request(method, url).type(type)
-                    .timeout({response: config.responseTimeout});
-
-                if (type === 'multipart/form-data') {
-                    each(opts.body, (v, k) => {
-                        if (v instanceof File) {
-                            rq = rq.attach(k, v);
+                    else {
+                        if (isObject(v)) {
+                            v = JSON.stringify(v);
                         }
-
-                        else {
-                            if (isObject(v)) {
-                                v = JSON.stringify(v);
-                            }
-                            rq = rq.field(k, v);
-                        }
-                    });
-                } else {
-                    rq = rq.send(opts.body);
-                }
-
-                return rq.then(onSuccess, onFailure);
+                        rq = rq.field(k, v);
+                    }
+                });
+            } else {
+                rq = rq.send(opts.body);
             }
 
-            if (method === 'DELETE') {
-                return request
-                    .del(url)
-                    .timeout({response: config.responseTimeout})
-                    .then(onSuccess, onFailure);
-            }
+            return rq.then(onSuccess, onFailure);
+        }
+
+        if (method === 'DELETE') {
+            return request
+                .del(url)
+                .timeout({response: config.responseTimeout})
+                .then(onSuccess, onFailure);
         }
     }
 }

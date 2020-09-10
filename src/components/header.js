@@ -38,18 +38,6 @@ export default class Header extends Component {
                 <Nav.Link><Link to="/newnote">New note</Link></Nav.Link>
                 <Nav.Link><Link to="/about">About</Link></Nav.Link>
               </Nav>
-              <Nav>
-                <Form inline>
-                  <FormControl
-                    type="text"
-                    placeHolder="Search"
-                    className="mr-sm-2"
-                  />
-                  <Button variant="outline-dark">
-                    Search
-                  </Button>
-                </Form>
-              </Nav>
             </Navbar.Collapse>
           </Navbar>
         </Styles>

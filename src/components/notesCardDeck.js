@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
-import { CardDeck} from "react-bootstrap";
+import { CardDeck, Form, FormControl, Button, Container, Col } from "react-bootstrap";
 
-import NoteCard from '../components/noteCard';
-
-// import { NOTES as mock } from './../lib/mockData.js';
+import NoteCard from './noteCard';
+import Loader from './loader';
 
 import service from '../services/NoteService';
+import ServerError from '../lib/errors/ServerError';
 
 export default class NotesCardDeck extends Component {
 
@@ -13,7 +13,13 @@ export default class NotesCardDeck extends Component {
         super(props);
         this.state = {
             notes: [],
+            filter:{
+                searchString: null,
+            },
         };
+
+        this.handleChange = this.handleChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     componentDidMount() {
@@ -24,24 +30,65 @@ export default class NotesCardDeck extends Component {
         this.setState({notes: []});
     }
 
+    handleChange(event) {
+        this.setState({
+            filter: { searchString: event.target.value }
+        }, () => {
+            this.load();
+        });
+    }
+
+    handleSubmit(event) {
+        this.load();
+        event.preventDefault();
+    }
+
     load() {
-        service.getAllNotes().then((data) => {
+        this.setState({
+            isLoading: true
+        });
+
+        service.getNotes({
+            filter: this.state.filter
+        }).then((data) => {
             if(data){
-                this.setState({notes: [...data]});
+                this.setState({
+                    notes: [...data],
+                    isLoading: false,
+                });
             }
+        }).catch(e => {
+            this.setState({
+                notes: null,
+            });
         });
     }
 
     render() {
+        const { notes, } = this.state;
+
         return (
             <>
-                <CardDeck className="m-4">
-                    {
-                        this.state.notes.map((note) => (
-                            <NoteCard id={note.id} content={note.content} lastUpdate={new Date(Date.parse(note.lastUpdate)).toLocaleString()} />
-                        ))
-                    }
-                </CardDeck>
+                <Container>
+                    <Form onSubmit={this.handleSubmit}>
+                        <FormControl
+                            type="text"
+                            placeHolder="Search notes"
+                            onChange={this.handleChange}
+                        />
+                    </Form>
+                </Container>
+                {
+                    notes ? (
+                        <CardDeck className="m-4">
+                            {
+                                notes.map((note) => (
+                                    <NoteCard id={note.id} content={note.content} lastUpdate={new Date(Date.parse(note.lastUpdate)).toLocaleString()} />
+                                ))
+                            }
+                        </CardDeck>
+                    ) : 'Notes not found'
+                }
             </>
         );
     }

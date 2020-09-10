@@ -6,7 +6,7 @@ export default class NoteCard extends Component {
         return (
             <>
                 <Col sm="12" md="12" lg="6" xl="4" className="my-3">
-                    <Card bg="light" border="dark">
+                    <Card id={this.props.id} bg="light" border="dark">
                         <Card.Body>
                             <Card.Text>
                                 {this.props.content}
@@ -14,9 +14,6 @@ export default class NoteCard extends Component {
                             <Card.Footer className="my-2">
                                 {this.props.lastUpdate}
                             </Card.Footer>
-                            <Button variant="outline-dark">
-                                EDIT
-                            </Button>
                             <Button variant="outline-danger" className="ml-2">
                                 DELETE
                             </Button>
