@@ -13,6 +13,29 @@ export class NoteService extends BaseService {
             url: `/notes/${noteId}`,
         });
     }
+
+    deleteNote(noteId){
+        return super.request({
+            url: `/notes/${noteId}`,
+            method: 'DELETE',
+        });
+    }
+
+    updateNote(note){
+        return super.request({
+            url: `/notes`,
+            method: 'PUT',
+            body: JSON.stringify(note),
+        });
+    }
+
+    addNote(note){
+        return super.request({
+            url: `/notes`,
+            method: 'POST',
+            body: JSON.stringify(note),
+        });
+    }
 }
 
 export default new NoteService()

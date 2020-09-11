@@ -1,18 +1,16 @@
 import React, { Component } from 'react'
-import { CardDeck, Form, FormControl, Button, Container, Col } from "react-bootstrap";
+import { CardDeck, Form, FormControl, Container } from "react-bootstrap";
 
 import NoteCard from './noteCard';
-import Loader from './loader';
 
 import service from '../services/NoteService';
-import ServerError from '../lib/errors/ServerError';
 
 export default class NotesCardDeck extends Component {
 
     constructor(props){
         super(props);
         this.state = {
-            notes: [],
+            notes: null,
             filter:{
                 searchString: null,
             },
@@ -23,49 +21,62 @@ export default class NotesCardDeck extends Component {
     }
 
     componentDidMount() {
-        this.load();
+        this.loadNotes();
     }
 
     componentWillUnmount() {
-        this.setState({notes: []});
+        this.setState({notes: null});
     }
 
     handleChange(event) {
         this.setState({
             filter: { searchString: event.target.value }
         }, () => {
-            this.load();
+            this.loadNotes();
         });
     }
 
     handleSubmit(event) {
-        this.load();
+        this.loadNotes();
         event.preventDefault();
     }
 
-    load() {
-        this.setState({
-            isLoading: true
-        });
+    handleDeleteClick = (event, noteId) => {
+        this.deleteNote(noteId);
+        event.preventDefault();
+    }
 
-        service.getNotes({
-            filter: this.state.filter
-        }).then((data) => {
-            if(data){
+    loadNotes() {
+        this.setState({
+            notes: [],
+        }, () => {
+            service.getNotes({
+                filter: this.state.filter
+            }).then((data) => {
+                if(data){
+                    this.setState({
+                        notes: [...data],
+                    });
+                }
+            }).catch(e => {
                 this.setState({
-                    notes: [...data],
-                    isLoading: false,
+                    notes: null,
                 });
-            }
-        }).catch(e => {
-            this.setState({
-                notes: null,
             });
         });
     }
 
+    deleteNote(noteId){
+        service.deleteNote(noteId).then(
+            () => {
+                this.loadNotes();
+            }
+        );
+    }
+
     render() {
-        const { notes, } = this.state;
+
+        const { notes } = this.state;
 
         return (
             <>
@@ -83,7 +94,14 @@ export default class NotesCardDeck extends Component {
                         <CardDeck className="m-4">
                             {
                                 notes.map((note) => (
-                                    <NoteCard id={note.id} content={note.content} lastUpdate={new Date(Date.parse(note.lastUpdate)).toLocaleString()} />
+                                    <NoteCard
+                                        id={note.id}
+                                        content={note.content}
+                                        lastUpdate={
+                                            new Date(Date.parse(note.lastUpdate)).toLocaleString()
+                                        }
+                                        onDeleteClick={(event) => this.handleDeleteClick(event, note.id)}
+                                    />
                                 ))
                             }
                         </CardDeck>
