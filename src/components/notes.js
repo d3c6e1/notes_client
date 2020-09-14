@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { CardDeck, Form, FormControl, Container } from "react-bootstrap";
+import { CardDeck, Form, FormControl } from "react-bootstrap";
 
 import service from '../services/NoteService';
 
@@ -74,7 +74,7 @@ export default class Notes extends Component {
         });
     }
 
-    // note modal hide
+    // update note after modal hide
     handleHide = () => {
         const note = this.state.notePopUp.note;
         service.updateNote(note).then(
@@ -82,7 +82,6 @@ export default class Notes extends Component {
                 this.loadNotes();
             }
         );
-
         this.setState({
             notePopUp:{
                 show: false,
@@ -95,6 +94,7 @@ export default class Notes extends Component {
         });
     }
 
+    // save changes to state
     handleChangeNoteForm = event => {
         this.setState({
             notePopUp:{
@@ -140,7 +140,7 @@ export default class Notes extends Component {
 
         return (
             <>
-                <Container className="mt-2">
+                <div className="mt-3 mx-3">
                     <Form onSubmit={this.handleSearchInputSubmit}>
                         <FormControl
                             type="text"
@@ -148,10 +148,10 @@ export default class Notes extends Component {
                             onChange={this.handleSearchInputChange}
                         />
                     </Form>
-                </Container>
+                </div>
                 {
                     notes ? (
-                        <CardDeck className="">
+                        <CardDeck>
                             {
                                 notes.map((note) => (
                                     <NoteCard
