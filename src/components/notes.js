@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import { CardDeck, Form, FormControl, Container } from "react-bootstrap";
 
-import NoteCard from './noteCard';
-
 import service from '../services/NoteService';
+
+import NoteCard from './noteCard';
 import NotePopUp from './notePopUp';
 
 export default class Notes extends Component {
@@ -15,8 +15,15 @@ export default class Notes extends Component {
             filter:{
                 searchString: null,
             },
+            notePopUp:{
+                show: false,
+                note: {
+                    id: null,
+                    content: null,
+                    lastUpdate: null,
+                },
+            }
         };
-        this.notePopUp = React.createRef();
     }
 
     componentDidMount() {
@@ -28,7 +35,7 @@ export default class Notes extends Component {
     }
 
     // search input
-    handleChange = event => {
+    handleSearchInputChange = event => {
         this.setState({
             filter: { searchString: event.target.value }
         }, () => {
@@ -37,7 +44,7 @@ export default class Notes extends Component {
     }
 
     // search input submit(enter)
-    handleSubmit = event => {
+    handleSearchInputSubmit = event => {
         event.preventDefault();
         this.loadNotes();
     }
@@ -45,13 +52,64 @@ export default class Notes extends Component {
     // DELETE button
     handleDeleteClick = (event, noteId) => {
         event.preventDefault();
-        this.deleteNote(noteId);
+        service.deleteNote(noteId).then(
+            () => {
+                this.loadNotes();
+            }
+        );
     }
 
     // click on note card
     handleNoteClick = (event, note) => {
         event.preventDefault();
-        this.notePopUp.current.showNote(note);
+        this.setState({
+            notePopUp:{
+                show: true,
+                note: {
+                    id: note.id,
+                    content: note.content,
+                    lastUpdate: note.lastUpdate,
+                },
+            }
+        });
+    }
+
+    // note modal hide
+    handleHide = () => {
+        const note = this.state.notePopUp.note;
+        service.updateNote(note).then(
+            () => {
+                this.loadNotes();
+            }
+        );
+
+        this.setState({
+            notePopUp:{
+                show: false,
+                note: {
+                    id: null,
+                    content: null,
+                    lastUpdate: null,
+                },
+            }
+        });
+    }
+
+    handleChangeNoteForm = event => {
+        this.setState({
+            notePopUp:{
+                show: true,
+                note:{
+                    id: this.state.notePopUp.note.id,
+                    content: event.target.value,
+                    lastUpdate: new Date()
+                }
+            }
+        });
+    }
+
+    handleSubmitNoteForm = event => {
+        event.preventDefault();
     }
 
     loadNotes() {
@@ -74,13 +132,6 @@ export default class Notes extends Component {
         });
     }
 
-    deleteNote(noteId) {
-        service.deleteNote(noteId).then( () => {
-                this.loadNotes();
-            }
-        );
-    }
-
     render() {
 
         const {
@@ -90,11 +141,11 @@ export default class Notes extends Component {
         return (
             <>
                 <Container className="mt-2">
-                    <Form onSubmit={this.handleSubmit}>
+                    <Form onSubmit={this.handleSearchInputSubmit}>
                         <FormControl
                             type="text"
-                            placeHolder="Search notes"
-                            onChange={this.handleChange}
+                            placeholder="Search notes"
+                            onChange={this.handleSearchInputChange}
                         />
                     </Form>
                 </Container>
@@ -104,6 +155,7 @@ export default class Notes extends Component {
                             {
                                 notes.map((note) => (
                                     <NoteCard
+                                        key={note.id}
                                         content={note.content}
                                         lastUpdate={
                                             new Date(Date.parse(note.lastUpdate)).toLocaleString()
@@ -121,7 +173,14 @@ export default class Notes extends Component {
                     ) : 'Notes not found'
                 }
                 <NotePopUp
-                    ref={this.notePopUp}
+                    show={this.state.notePopUp.show}
+                    onHide={this.handleHide}
+                    content={this.state.notePopUp.note.content}
+                    lastUpdate={
+                        new Date(Date.parse(this.state.notePopUp.note.lastUpdate)).toLocaleString()
+                    }
+                    onFormSubmit={(event) => this.handleSubmitNoteForm(event)}
+                    onFormChange={(event) => this.handleChangeNoteForm(event)}
                 />
             </>
         );

@@ -33,7 +33,7 @@ export default class BaseService {
             method: 'GET',
             url: null,
             body: null,
-            type: 'form',
+            type: 'application/json',
             params: null,
             callback: null,
             ...opts
@@ -65,7 +65,6 @@ export default class BaseService {
                     if (v instanceof File) {
                         rq = rq.attach(k, v);
                     }
-
                     else {
                         if (isObject(v)) {
                             v = JSON.stringify(v);
