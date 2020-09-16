@@ -51,7 +51,7 @@ export default class BaseService {
             if (headers) {
                 each(keys(headers), key => {
                     rq.set(key, headers[key]);
-                })
+                });
             }
             return rq.then(onSuccess, onFailure);
         }
