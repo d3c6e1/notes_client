@@ -1,11 +1,11 @@
 import React, { Component } from "react";
-import { Navbar, Nav, Form, FormControl, Button } from "react-bootstrap";
-import {Link} from 'react-router-dom';
+import { Navbar, Nav } from "react-bootstrap";
+import { NavLink} from 'react-router-dom';
 import logo from "../assets/logo.svg";
 import styled from 'styled-components';
 
 const Styles = styled.div`
-  a, .nav-link {
+  a, .navbar-nav {
     color: grey;
     &:hover {
       color: black;
@@ -13,6 +13,7 @@ const Styles = styled.div`
     &:active {
       color: red;
     };
+    margin: 0 0.5em;
   }
 `;
 
@@ -21,7 +22,7 @@ export default class Header extends Component {
     return (
       <>
         <Styles>
-          <Navbar collapseOnSelect expand="md" bg="light" variant="light">
+          <Navbar collapseOnSelect expand="sm" bg="light" variant="light">
             <Navbar.Brand href="/">
               <img
                 src={logo}
@@ -34,9 +35,9 @@ export default class Header extends Component {
             <Navbar.Toggle aria-controls="responsive-navbar-nav" />
             <Navbar.Collapse id="responsive-navbar-nav">
               <Nav className="mr-auto">
-                <Nav.Link><Link to="/">Home</Link></Nav.Link>
-                <Nav.Link><Link to="/newnote">New note</Link></Nav.Link>
-                <Nav.Link><Link to="/about">About</Link></Nav.Link>
+                <NavLink to="/">Home</NavLink>
+                <NavLink to="/newnote">New note</NavLink>
+                <NavLink to="/about">About</NavLink>
               </Nav>
             </Navbar.Collapse>
           </Navbar>

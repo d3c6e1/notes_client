@@ -3,10 +3,6 @@ import { Form, FormControl, Modal, ModalBody } from 'react-bootstrap';
 import ModalHeader from 'react-bootstrap/esm/ModalHeader';
 
 export default class NotePopUp extends Component {
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         return (
             <>

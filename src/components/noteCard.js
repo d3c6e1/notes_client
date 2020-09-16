@@ -10,8 +10,8 @@ export default class NoteCard extends Component {
                 content: props.content,
                 lastUpdate: props.lastUpdate,
             },
-            handleDeleteClick: props.onDeleteClick,
-            handleNoteClick: props.onNoteClick,
+            hDelete: props.onDeleteClick,
+            hNoteClick: props.onNoteClick,
         }
     }
 
@@ -19,8 +19,8 @@ export default class NoteCard extends Component {
 
         const {
             note,
-            handleDeleteClick,
-            handleNoteClick
+            hDelete,
+            hNoteClick
         } = this.state;
 
         return (
@@ -28,7 +28,7 @@ export default class NoteCard extends Component {
                 <Col sm="12" md="12" lg="6" xl="4" className="my-3">
                     <Card bg="light" border="dark">
                         <Card.Body>
-                            <div onClick={handleNoteClick}>
+                            <div onClick={hNoteClick}>
                                 <Card.Text>
                                     {note.content}
                                 </Card.Text>
@@ -36,7 +36,7 @@ export default class NoteCard extends Component {
                                     Last update: {note.lastUpdate}
                                 </Card.Footer>
                             </div>
-                            <Button variant="outline-danger" onClick={handleDeleteClick}>
+                            <Button variant="outline-danger" onClick={hDelete}>
                                 DELETE
                             </Button>
                         </Card.Body>

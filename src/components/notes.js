@@ -35,7 +35,7 @@ export default class Notes extends Component {
     }
 
     // search input
-    handleSearchInputChange = event => {
+    hSearchChange = event => {
         this.setState({
             filter: { searchString: event.target.value }
         }, () => {
@@ -44,13 +44,13 @@ export default class Notes extends Component {
     }
 
     // search input submit(enter)
-    handleSearchInputSubmit = event => {
+    hSearchSubmit = event => {
         event.preventDefault();
         this.loadNotes();
     }
 
     // DELETE button
-    handleDeleteClick = (event, noteId) => {
+    hDelete = (event, noteId) => {
         event.preventDefault();
         service.deleteNote(noteId).then(
             () => {
@@ -60,7 +60,7 @@ export default class Notes extends Component {
     }
 
     // click on note card
-    handleNoteClick = (event, note) => {
+    hNoteClick = (event, note) => {
         event.preventDefault();
         this.setState({
             notePopUp:{
@@ -76,8 +76,7 @@ export default class Notes extends Component {
 
     // update note after modal hide
     handleHide = () => {
-        const note = this.state.notePopUp.note;
-        service.updateNote(note).then(
+        service.updateNote(this.state.notePopUp.note).then(
             () => {
                 this.loadNotes();
             }
@@ -95,7 +94,7 @@ export default class Notes extends Component {
     }
 
     // save changes to state
-    handleChangeNoteForm = event => {
+    hNoteEdit = event => {
         this.setState({
             notePopUp:{
                 show: true,
@@ -108,7 +107,7 @@ export default class Notes extends Component {
         });
     }
 
-    handleSubmitNoteForm = event => {
+    hNoteSubmit = event => {
         event.preventDefault();
     }
 
@@ -136,16 +135,17 @@ export default class Notes extends Component {
 
         const {
             notes,
+            notePopUp,
         } = this.state;
 
         return (
             <>
                 <div className="mt-3 mx-3">
-                    <Form onSubmit={this.handleSearchInputSubmit}>
+                    <Form onSubmit={this.hSearchSubmit}>
                         <FormControl
                             type="text"
                             placeholder="Search notes"
-                            onChange={this.handleSearchInputChange}
+                            onChange={this.hSearchChange}
                         />
                     </Form>
                 </div>
@@ -161,10 +161,10 @@ export default class Notes extends Component {
                                             new Date(Date.parse(note.lastUpdate)).toLocaleString()
                                         }
                                         onDeleteClick={
-                                            (event) => this.handleDeleteClick(event, note.id)
+                                            (event) => this.hDelete(event, note.id)
                                         }
                                         onNoteClick={
-                                            (event) => this.handleNoteClick(event, note)
+                                            (event) => this.hNoteClick(event, note)
                                         }
                                     />
                                 ))
@@ -173,14 +173,14 @@ export default class Notes extends Component {
                     ) : 'Notes not found'
                 }
                 <NotePopUp
-                    show={this.state.notePopUp.show}
+                    show={notePopUp.show}
                     onHide={this.handleHide}
-                    content={this.state.notePopUp.note.content}
+                    content={notePopUp.note.content}
                     lastUpdate={
-                        new Date(Date.parse(this.state.notePopUp.note.lastUpdate)).toLocaleString()
+                        new Date(Date.parse(notePopUp.note.lastUpdate)).toLocaleString()
                     }
-                    onFormSubmit={(event) => this.handleSubmitNoteForm(event)}
-                    onFormChange={(event) => this.handleChangeNoteForm(event)}
+                    onFormSubmit={(event) => this.hNoteSubmit(event)}
+                    onFormChange={(event) => this.hNoteEdit(event)}
                 />
             </>
         );

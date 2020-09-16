@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Button, Form, FormControl, FormText, Row } from 'react-bootstrap'
-import { Redirect } from 'react-router-dom';
+import ReactDOM from 'react-dom';
 
 import service from '../services/NoteService';
 
@@ -9,7 +9,6 @@ export default class CreateNoteForm extends Component {
         super(props);
         this.state = {
             isDisabled: true,
-            noteSubmitted: false,
             note:{
                 content: null,
                 lastUpdate: new Date()
@@ -30,15 +29,17 @@ export default class CreateNoteForm extends Component {
 
     handleSubmit = event => {
         event.preventDefault();
-        this.setState({
-            isDisabled: true,
-        }, () => {
-            service.addNote(this.state.note).then(
-                this.setState({
-                    noteSubmitted: true
-                })
-            );
-        });
+        service.addNote(this.state.note).then(
+            this.setState({
+                isDisabled: true,
+                note: {
+                    content: null,
+                    lastUpdate: new Date()
+                }
+            })
+        );
+        ReactDOM.findDOMNode(this.noteForm).reset();
+        ReactDOM.findDOMNode(this.formInput).focus();
     }
 
     handleClick = (event) => {
@@ -46,35 +47,37 @@ export default class CreateNoteForm extends Component {
     }
 
     render() {
-        if (this.state.noteSubmitted) {
-            return  <Redirect to="/" />;
-        } else {
-            return (
-                <>
-                    <div className="mt-2 mx-2">
-                        <Form onSubmit={this.handleSubmit}>
-                            <FormControl
-                                as="textarea"
-                                rows={10}
-                                autoFocus
-                                onChange={this.handleChange}
-                            />
-                            <Row className="mt-2 mx-0">
-                                <Button
-                                    type="submit"
-                                    disabled={this.state.isDisabled}
-                                    onClick={(event) => this.handleClick(event)}
-                                >
-                                    Save note
-                                </Button>
-                                <FormText className="m-2" muted>
-                                    {this.state.note.lastUpdate.toLocaleString()}
-                                </FormText>
-                            </Row>
-                        </Form>
-                    </div>
-                </>
-            );
-        }
+        return (
+            <>
+                <div className="mt-2 mx-2">
+                    <Form
+                        className="form"
+                        ref={ form => this.noteForm = form}
+                        onSubmit={this.handleSubmit}
+                    >
+                        <FormControl
+                            className="forminput"
+                            ref={ forminput => this.formInput = forminput}
+                            as="textarea"
+                            rows={10}
+                            autoFocus
+                            onChange={this.handleChange}
+                        />
+                        <Row className="mt-2 mx-0">
+                            <Button
+                                type="submit"
+                                disabled={this.state.isDisabled}
+                                onClick={(event) => this.handleClick(event)}
+                            >
+                                Save note
+                            </Button>
+                            <FormText className="m-2" muted>
+                                {this.state.note.lastUpdate.toLocaleString()}
+                            </FormText>
+                        </Row>
+                    </Form>
+                </div>
+            </>
+        );
     }
 }
